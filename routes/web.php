@@ -22,7 +22,10 @@ Route::get('/', function () {
 
 Route::get('/shop', [ShopController::class, 'index'])->name('index');
 Route::get('/cart', [CartController::class, 'index'])->name('index.cart');
-
+Route::get('/cart/count', [CartController::class, 'count'])->name('count.cart');
+Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
+Route::post('/cart/remove/{product}', [CartController::class, 'removeFromCart'])->name('cart.remove');
+Route::post('/cart/update/{product}', [CartController::class, 'updateCart'])->name('cart.update');
 Route::middleware(['auth'])->group(function () {
 Route::get('/payment', [PaymentController::class, 'showPaymentForm'])->name('payment.form');
 Route::post('/payment/process', [PaymentController::class, 'processPayment'])->name('payment.process');
