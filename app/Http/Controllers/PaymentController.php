@@ -18,29 +18,18 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function createPaymentIntent(Request $request)
+    public function processPayment(Request $request)
     {
-        $request->validate([
-            'amount' => 'required|numeric|min:1',
-        ]);
-
         Stripe::setApiKey(config('services.stripe.secret'));
 
         $paymentIntent = PaymentIntent::create([
-            'amount' => $request->amount * 100, // in cents
+            'amount' => 5000, // $50.00
             'currency' => 'usd',
-            'automatic_payment_methods' => [
-                'enabled' => true,
-            ],
+            'metadata' => ['integration_check' => 'accept_a_payment'],
         ]);
 
         return response()->json([
             'clientSecret' => $paymentIntent->client_secret,
         ]);
-    }
-
-    public function paymentSuccess(Request $request)
-    {
-        return view('payment.success');
     }
 }
