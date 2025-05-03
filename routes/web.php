@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\WebhookController;
-
+use App\Http\Controllers\ShopController;
+use App\Http\Controllers\CartController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -19,10 +20,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/shop', [ShopController::class, 'index'])->name('index');
+Route::get('/cart', [CartController::class, 'index'])->name('index.cart');
+
 Route::middleware(['auth'])->group(function () {
-//     Route::get('/payment', [PaymentController::class, 'showPaymentForm'])->name('payment.form');
-// Route::post('/payment/intent', [PaymentController::class, 'createPaymentIntent'])->name('payment.intent');
-// Route::get('/payment/success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
 Route::get('/payment', [PaymentController::class, 'showPaymentForm'])->name('payment.form');
 Route::post('/payment/process', [PaymentController::class, 'processPayment'])->name('payment.process');
 Route::post('/webhook/stripe', [WebhookController::class, 'handleWebhook']);
