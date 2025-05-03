@@ -46,3 +46,23 @@ php artisan key:generate
 npm install && npm run dev
 
 php artisan serve
+
+```
+
+### Set up Stripe API keys:
+- Open your .env file and add your Stripe keys:
+
+```bash
+STRIPE_KEY=pk_test_XXXXXXXXXXXX
+STRIPE_SECRET=sk_test_XXXXXXXXXXXX
+
+```
+### 🧪 Testing the Checkout
+- Use Stripe’s test card to simulate a checkout process:
+
+```bash
+Card Number: 4242 4242 4242 4242  
+Expiration: Any future date  
+CVC: Any 3 digits  
+ZIP: Any 5 digits
+```
