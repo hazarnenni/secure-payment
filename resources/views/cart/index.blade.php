@@ -71,21 +71,16 @@
                     <span class="summary-value" id="summary-shipping-value">$9.99</span>
                 </div>
 
-                <div class="summary-row">
-                    <span class="summary-label">Tax</span>
-                    <span class="summary-value" id="summary-tax-value">
-                        ${{ number_format($cartItems->sum(fn($item) => $item['product']->price * $item['quantity']) * 0.08, 2) }}
-                    </span>
-                </div>
-
                 <div class="summary-row total-row">
                     <span>Total</span>
                     <span class="summary-value" id="summary-total-value">
-                        ${{ number_format($cartItems->sum(fn($item) => $item['product']->price * $item['quantity']) * 1.08 + 9.99, 2) }}
+                        ${{ number_format($cartItems->sum(fn($item) => $item['product']->price * $item['quantity']) + 9.99, 2) }}
                     </span>
                 </div>
-
-                <button class="checkout-btn">Proceed to Checkout</button>
+                <form action="{{ route('stripe.checkout') }}" method="POST" id="checkout-form">
+                    @csrf
+                    <button type="submit" class="checkout-btn">Proceed to Checkout</button>
+                </form>
                 <a href="/shop" class="continue-shopping">
                     <i class="fas fa-arrow-left"></i> Continue Shopping
                 </a>

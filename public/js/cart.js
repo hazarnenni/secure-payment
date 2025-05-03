@@ -32,7 +32,7 @@ toastr.options = {
 
 function fetchCartCount() {
     fetch('/cart/count', {
-        credentials: 'same-origin' // Important to include cookies
+        credentials: 'same-origin'
     })
     .then(response => response.json())
     .then(data => {
@@ -43,7 +43,6 @@ function fetchCartCount() {
     });
 }
 
-// Fetch cart count on page load
 document.addEventListener('DOMContentLoaded', fetchCartCount);
 
 
@@ -143,7 +142,6 @@ function refreshCartSummary() {
         .then(data => {
             document.getElementById('summary-subtotal-label').innerText = `Subtotal (${data.quantity} items)`;
             document.getElementById('summary-subtotal-value').innerText = `$${data.subtotal}`;
-            document.getElementById('summary-tax-value').innerText = `$${data.tax}`;
             document.getElementById('summary-total-value').innerText = `$${data.total}`;
         })
         .catch(err => console.error('Failed to update summary', err));

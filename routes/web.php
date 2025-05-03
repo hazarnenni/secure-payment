@@ -27,11 +27,14 @@ Route::get('/cart/summary', [CartController::class, 'getCartSummary']);
 Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
 Route::post('/cart/remove/{product}', [CartController::class, 'removeFromCart'])->name('cart.remove');
 Route::post('/cart/update/{product}', [CartController::class, 'updateCart'])->name('cart.update');
-Route::middleware(['auth'])->group(function () {
-Route::get('/payment', [PaymentController::class, 'showPaymentForm'])->name('payment.form');
-Route::post('/payment/process', [PaymentController::class, 'processPayment'])->name('payment.process');
-Route::post('/webhook/stripe', [WebhookController::class, 'handleWebhook']);
+Route::post('/checkout', [PaymentController::class, 'checkout'])->name('stripe.checkout');
+Route::get('/checkout/success', fn() => view('checkout.success'))->name('checkout.success');
+Route::get('/checkout/cancel', fn() => view('checkout.cancel'))->name('checkout.cancel');
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/payment', [PaymentController::class, 'showPaymentForm'])->name('payment.form');
+    Route::post('/payment/process', [PaymentController::class, 'processPayment'])->name('payment.process');
+    Route::post('/webhook/stripe', [WebhookController::class, 'handleWebhook']);
 });
 
 Route::post('/stripe/webhook', [PaymentController::class, 'handleWebhook'])->name('stripe.webhook');
