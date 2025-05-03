@@ -81,3 +81,71 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.quantity-control').forEach(control => {
+        const input = control.querySelector('.quantity-input');
+        const minusBtn = control.querySelector('.quantity-btn.minus');
+        const plusBtn = control.querySelector('.quantity-btn.plus');
+        const productId = control.dataset.id;
+
+        function updateQuantity(newQuantity) {
+            fetch(`/cart/update/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ quantity: newQuantity })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    toastr.success(data.message);
+                    refreshCartSummary();
+                } else {
+                    toastr.error('Impossible de mettre à jour la quantité.');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                toastr.error('Erreur de mise à jour du panier.');
+            });
+        }
+
+        minusBtn.addEventListener('click', () => {
+            let qty = parseInt(input.value) || 1;
+            if (qty > 1) {
+                input.value = --qty;
+                updateQuantity(qty);
+            }
+        });
+
+        plusBtn.addEventListener('click', () => {
+            let qty = parseInt(input.value) || 1;
+            input.value = ++qty;
+            updateQuantity(qty);
+        });
+
+        input.addEventListener('change', () => {
+            let qty = Math.max(parseInt(input.value) || 1, 1);
+            input.value = qty;
+            updateQuantity(qty);
+        });
+    });
+});
+
+function refreshCartSummary() {
+    fetch('/cart/summary')
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('summary-subtotal-label').innerText = `Subtotal (${data.quantity} items)`;
+            document.getElementById('summary-subtotal-value').innerText = `$${data.subtotal}`;
+            document.getElementById('summary-tax-value').innerText = `$${data.tax}`;
+            document.getElementById('summary-total-value').innerText = `$${data.total}`;
+        })
+        .catch(err => console.error('Failed to update summary', err));
+}
+

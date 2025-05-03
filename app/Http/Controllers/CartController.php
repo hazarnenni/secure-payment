@@ -71,26 +71,53 @@ class CartController extends Controller
 
     public function updateCart(Request $request, $productId)
     {
-        $request->validate([
-            'quantity' => 'required|numeric|min:1'
-        ]);
-
-        $cart = json_decode($request->cookie('cart', '[]'), true);
+        $cart = json_decode(Cookie::get('cart', '[]'), true);
+        $quantity = max((int)$request->input('quantity'), 1);
 
         foreach ($cart as &$item) {
             if ($item['product_id'] == $productId) {
-                $item['quantity'] = $request->quantity;
+                $item['quantity'] = $quantity;
                 break;
             }
         }
 
-        return back()
-            ->with('success', 'Cart updated!')
-            ->cookie('cart', json_encode($cart), 60 * 24 * 30);
+        $updatedCart = array_values($cart);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Quantity updated.',
+        ])->cookie('cart', json_encode($updatedCart), 60 * 24 * 30);
     }
     public function count(){
         $cart = json_decode(Cookie::get('cart', '[]'), true);
         $count = collect($cart)->sum('quantity');
         return response()->json(['count' => $count]);
     }
+
+    public function getCartSummary()
+    {
+        $cart = json_decode(Cookie::get('cart', '[]'), true);
+
+        $subtotal = 0;
+        $quantity = 0;
+
+        foreach ($cart as $item) {
+            $product = Product::find($item['product_id']);
+            if ($product) {
+                $subtotal += $product->price * $item['quantity'];
+                $quantity += $item['quantity'];
+            }
+        }
+
+        $tax = round($subtotal * 0.08, 2);
+        $total = round($subtotal + $tax + 9.99, 2);
+
+        return response()->json([
+            'subtotal' => number_format($subtotal, 2),
+            'quantity' => $quantity,
+            'tax' => number_format($tax, 2),
+            'total' => number_format($total, 2),
+        ]);
+    }
+
 }

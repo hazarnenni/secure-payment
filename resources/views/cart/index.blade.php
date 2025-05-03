@@ -40,17 +40,13 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="item-price">
+                        <div class="item-price" data-product-id="{{ $item['product']->id }}">
                             <div class="price">${{ number_format($item['product']->price, 2) }}</div>
-                            <form action="{{ route('cart.update', $item['product']->id) }}" method="POST" class="quantity-form">
-                                @csrf
-                                <div class="quantity-control">
-                                    <button class="quantity-btn">-</button>
-                                    <input type="text" class="quantity-input" value="1">
-                                    <button class="quantity-btn">+</button>
-                                </div>
-                                <button type="submit" class="update-btn" style="display:none">Update</button>
-                            </form>
+                            <div class="quantity-control" data-id="{{ $item['product']->id }}">
+                                <button type="button" class="quantity-btn minus">-</button>
+                                <input type="text" class="quantity-input" value="{{ $item['quantity'] }}">
+                                <button type="button" class="quantity-btn plus">+</button>
+                            </div>
                         </div>
                     </div>
                 @endforeach
@@ -58,43 +54,44 @@
         </div>
 
         @unless($cartItems->isEmpty())
-            <!-- Order Summary -->
             <div class="order-summary">
                 <h3 class="summary-title">Order Summary</h3>
+
                 <div class="summary-row">
-                    <span class="summary-label">Subtotal ({{ $cartItems->sum('quantity') }} items)</span>
-                    <span class="summary-value">
-                        ${{ number_format($cartItems->sum(function($item) {
-                            return $item['product']->price * $item['quantity'];
-                        }), 2) }}
+                    <span class="summary-label" id="summary-subtotal-label">
+                        Subtotal ({{ $cartItems->sum('quantity') }} items)
+                    </span>
+                    <span class="summary-value" id="summary-subtotal-value">
+                        ${{ number_format($cartItems->sum(fn($item) => $item['product']->price * $item['quantity']), 2) }}
                     </span>
                 </div>
+
                 <div class="summary-row">
                     <span class="summary-label">Shipping</span>
-                    <span class="summary-value">$9.99</span>
+                    <span class="summary-value" id="summary-shipping-value">$9.99</span>
                 </div>
+
                 <div class="summary-row">
                     <span class="summary-label">Tax</span>
-                    <span class="summary-value">
-                        ${{ number_format($cartItems->sum(function($item) {
-                            return $item['product']->price * $item['quantity'];
-                        }) * 0.08, 2) }}
+                    <span class="summary-value" id="summary-tax-value">
+                        ${{ number_format($cartItems->sum(fn($item) => $item['product']->price * $item['quantity']) * 0.08, 2) }}
                     </span>
                 </div>
+
                 <div class="summary-row total-row">
                     <span>Total</span>
-                    <span>
-                        ${{ number_format($cartItems->sum(function($item) {
-                            return $item['product']->price * $item['quantity'];
-                        }) * 1.08 + 9.99, 2) }}
+                    <span class="summary-value" id="summary-total-value">
+                        ${{ number_format($cartItems->sum(fn($item) => $item['product']->price * $item['quantity']) * 1.08 + 9.99, 2) }}
                     </span>
                 </div>
+
                 <button class="checkout-btn">Proceed to Checkout</button>
                 <a href="/shop" class="continue-shopping">
                     <i class="fas fa-arrow-left"></i> Continue Shopping
                 </a>
             </div>
-        @endunless
+            @endunless
+
     </div>
 
 @endsection
